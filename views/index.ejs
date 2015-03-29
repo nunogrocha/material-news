@@ -1,0 +1,242 @@
+<html>
+<head>
+    <title>Material News</title>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/0.8.3/angular-material.min.css">
+    <link rel="stylesheet" href="stylesheets/style.css">
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.10/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular-animate.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular-aria.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angular_material/0.8.3/angular-material.min.js"></script>
+    <script src="/javascripts/angular-material-icons.min.js"></script>
+    <script src="/javascripts/app.js"></script>
+    <script src="/javascripts/config.js"></script>
+    <script src="/javascripts/controllers.js"></script>
+    <script src="/javascripts/services.js"></script>
+    <style> .glyphicon-thumbs-up { cursor:pointer } </style>
+</head>
+
+<body ng-app="news" ng-controller="MainCtrl" layout="column" layout-fill>
+
+    <md-toolbar md-scroll-shrink layout="row" ng-controller="NavCtrl">
+        <div class="md-toolbar-tools">
+            <div layout="row" flex="" class="fill-height">
+                <h2 class="md-toolbar-item" style="">
+                    <a href="/#/home">Material News</a>
+                </h2>
+                <span flex=""></span>
+                <div class="md-toolbar-item" style="margin-left: auto;" layout="column" layout-gt-md="row">
+                    <div class="toolbarbutton" ng-show="isLoggedIn()">{{ currentUser() }}</div>
+                    <div class="toolbarbutton" ng-show="isLoggedIn()"><a href="" ng-click="logOut()">Log Out</a></div>
+                    <div class="toolbarbutton" ng-hide="isLoggedIn()"><a href="/#/login">Log In</a></div>
+                    <div class="toolbarbutton" ng-hide="isLoggedIn()"><a href="/#/register">Register</a></div>
+                </div>
+            </div>
+        </div>
+    </md-toolbar>
+
+    <ui-view></ui-view>
+
+    <script type="text/ng-template" id="/home.html">
+        <md-content>
+            <md-list>
+                <md-item ng-repeat="post in posts | orderBy:'-upvotes'">
+                    <md-item-content>
+                        <div class="md-tile-content list-item" layout="row" layout-wrap>
+
+                            <div flex="90">
+                                <h3>
+                                    <a ng-show="post.link" target="_blank" href="{{post.link}}">
+                                        <div class="md-tile-left">
+                                            <div class="list-circle" ng-style="{'background-color':post.color}">
+                                                <span class="char">
+                                                    {{ firstletter(post.title) }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        {{post.title}}
+                                        <span class="md-subhead">({{post.link}})</span>
+                                    </a>
+
+                                    <a ng-show="!post.link" href="#/posts/{{post._id}}">
+                                        <div class="md-tile-left">
+                                            <div class="list-circle" ng-style="{'background-color':'#9E9E9E'}">
+                                                <span class="char">
+                                                    {{ firstletter(post.title) }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        {{post.title}}
+                                        <span class="md-subhead">(blog post)</span>
+                                    </a>
+                                </h3>
+
+                                <h4>
+                                    {{post.upvotes}} Points
+                                    <span ng-show="post.author">
+                                        by {{post.author}} |
+                                    </span>
+                                    <span ng-show="post.date">
+                                        {{post.date | date:"MM/dd/yyyy 'at' h:mma"}} |
+                                    </span>
+                                    <a href="#/posts/{{post._id}}"><b>Comments</b></a>
+                                </h4>
+                            </div>
+
+                            <div flex="10">
+                                <div class="votes">
+                                    <ng-md-icon icon="thumb_up" style="fill: #66BB6A; cursor:pointer" size="25" ng-click="incrementUpvotes(post)"></ng-md-icon>
+                                    <span class="upvotes"> </span>
+                                    <ng-md-icon icon="thumb_down" style="fill: #E57373; cursor:pointer" size="25" ng-click="decrementUpvotes(post)"></ng-md-icon>
+                                </div>
+                            </div>
+
+                        </div>
+                    </md-item-content>
+                    <md-divider ng-if="!$last"></md-divider>
+                </md-item>
+            </md-list>
+        </md-content>
+
+        <md-button class="md-fab" aria-label="Eat cake" ng-click="showAddDialog($event)">
+            <ng-md-icon icon="add" style="fill: #fff; cursor:pointer" size="32" ></ng-md-icon>
+        </md-button>
+    </script>
+
+    <script type="text/ng-template" id="/posts.html">
+        <md-content class="md-padding">
+            <div class="page-header">
+                <h3>
+                    <a ng-show="post.link" target="_blank" href="{{post.link}}">
+                        {{post.title}}
+                    </a>
+                    <span ng-hide="post.link">
+                        {{post.title}}
+                    </span>
+
+                    <h5>
+                        {{post.upvotes}} Points
+                        <span ng-show="post.author">
+                            by {{post.author}} | Posted on
+                        </span>
+                        <span ng-show="post.date">
+                            {{post.date | date:"MM/dd/yyyy 'at' h:mma"}}
+                        </span>
+                    </h5>
+
+                </h3>
+
+                <p class="md-article">{{post.message}}</p>
+
+            </div>
+
+            <div ng-repeat="comment in post.comments | orderBy:'-upvotes'">
+                <md-card>
+                    <p class="messageBody">
+                        {{comment.body}}
+                    </p>
+
+                    <div class="messageFooter">
+                        <p>
+                            {{comment.upvotes}} points by {{comment.author}} |
+                            <span ng-show="post.date">
+                                {{comment.date | date:"MM/dd/yyyy 'at' h:mma"}}
+                            </span>
+                            <ng-md-icon icon="thumb_up" class="votes" style="fill: #66BB6A; cursor:pointer" size="14" ng-click="incrementUpvotes(comment)"></ng-md-icon>
+                            <ng-md-icon icon="thumb_down" class="votes" style="fill: #E57373; cursor:pointer" size="14" ng-click="decrementUpvotes(comment)"></ng-md-icon>
+
+                        </p>
+                    </div>
+                </md-card>
+            </div>
+
+            <md-card class="cardpadding">
+                <p class="md-headline">Add a new comment</p>
+
+                <div ng-hide="isLoggedIn()">
+                    <h3>You need to <a href="/#/login">Log In</a> or <a href="/#/register">Register</a> before you can comment.</h3>
+                </div>
+
+                <form ng-submit="addComment()" ng-show="isLoggedIn()" >
+
+
+                    <md-input-container>
+                        <label>Message</label>
+                        <textarea columns="2" md-maxlength="300" ng-model="body"></textarea>
+                    </md-input-container>
+                    <md-button ng-click="addPost()" type="submit" class="md-primary md-raised">Post</md-button>
+                </form>
+            </md-card>
+        </md-content>
+    </script>
+
+    <script type="text/ng-template" id="/register.html">
+        <md-content layout="row">
+            <div flex></div>
+
+            <div flex>
+                <md-card style="margin-top:40px">
+                    <md-card-content>
+                        <div ng-show="error" class="alert alert-danger row">
+                            <span>{{ error.message }}</span>
+                        </div>
+
+                        <form ng-submit="register()">
+                            <h3>Register</h3>
+
+                            <md-input-container>
+                                <label>Username</label>
+                                <input type="text" ng-model="user.username"></input>
+                            </md-input-container>
+
+                            <md-input-container>
+                                <label>Password</label>
+                                <input type="password" ng-model="user.password"></input>
+                            </md-input-container>
+
+                            <md-button type="submit" class="md-primary md-raised">Register</md-button>
+                        </form>
+                    </md-card-content>
+                </md-card>
+            </div>
+
+            <div flex></div>
+        </md-content>
+    </script>
+
+    <script type="text/ng-template" id="/login.html">
+        <md-content layout="row">
+            <div flex></div>
+
+            <div flex>
+                <md-card style="margin-top:40px">
+                    <md-card-content>
+                        <div ng-show="error" class="alert alert-danger row">
+                            <span>{{ error.message }}</span>
+                        </div>
+
+                        <form ng-submit="logIn()">
+                            <h3>Login</h3>
+
+                            <md-input-container>
+                                <label>Username</label>
+                                <input type="text" ng-model="user.username"></input>
+                            </md-input-container>
+
+                            <md-input-container>
+                                <label>Password</label>
+                                <input type="password" ng-model="user.password"></input>
+                            </md-input-container>
+
+                            <md-button type="submit" class="md-primary md-raised">Login</md-button>
+                        </form>
+                    </md-card-content>
+                </md-card>
+            </div>
+
+            <div flex></div>
+        </md-content>
+    </script>
+
+</body>
+</html>

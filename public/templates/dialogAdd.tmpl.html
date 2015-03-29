@@ -1,0 +1,27 @@
+<md-dialog style="min-width:500px" aria-label="Add a new post">
+  <md-content class="sticky-container" layout="column">
+    <h4>Add a new post</h4>
+    <div class="dialog-content">
+        <div ng-hide="isLoggedIn()">
+            <h3>You need to <a ng-click="hide()" href="/#/login">Log In</a> or <a ng-click="hide()" href="/#/register">Register</a> before you can add a post.</h3>
+        </div>
+        <div ng-show="isLoggedIn()" layout="column">
+            <md-input-container>
+                <label>Title</label>
+                <input type="text" ng-model="title" md-maxlength="150"></input>
+            </md-input-container>
+            <md-input-container>
+                <label>Link</label>
+                <input type="text" ng-model="link"></input>
+            </md-input-container>
+            <md-input-container>
+                <label>Message</label>
+                <textarea columns="3" md-maxlength="700" ng-model="message"></textarea>
+            </md-input-container>
+
+            <md-button ng-click="hide()">Close</md-button>
+            <md-button ng-click="addPost()" class="md-primary">Post</md-button>
+        </div>
+    </div>
+  </md-content>
+</md-dialog>
