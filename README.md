@@ -1,6 +1,8 @@
 # material-news
 News platform similar to hacker news/reddit. Developed using [Node.js](https://nodejs.org/), [AngularJS](https://angularjs.org/), [Express](http://expressjs.com/), [MongoDB](https://www.mongodb.org/), [Angular Material](https://material.angularjs.org/#/) and [Passport](http://passportjs.org/).
 
+# [Live Demo](https://material-news.herokuapp.com/)
+
 # How to deploy
 * Install [Node.js](https://nodejs.org/)
 * Install [MongoDB](https://www.mongodb.org/)
